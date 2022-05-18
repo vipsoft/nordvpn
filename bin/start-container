@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cd /vagrant
+if [ -e .env ]; then
+    source .env
+fi
 
 apt-get update && \
 apt-get install -y docker.io && \
@@ -15,6 +17,8 @@ if [ $? -eq 0 ]; then
         docker exec $CID ls -l /run/nordvpn/nordvpnd.sock 2>/dev/null
     done
 
-    docker exec $CID nordvpn login --username 'your-nordaccount-username' --password 'your-nordaccount-password' && \
-    docker exec $CID nordvpn connect United_States
+    if [ "$NORDACCOUNT_USERNAME" ]; then
+        docker exec $CID nordvpn login --username "$NORDACCOUNT_USERNAME" --password "$NORDACCOUNT_PASSWORD" && \
+        docker exec $CID nordvpn connect United_States
+    fi
 fi

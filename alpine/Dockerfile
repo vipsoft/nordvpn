@@ -7,5 +7,7 @@ RUN apk add wget dpkg iptables iproute2 procps ca-certificates libxml2 libidn2 z
     dpkg --install --force-depends /tmp/nordvpn.deb && \
     mkdir -p /run/nordvpn
 
-#ENTRYPOINT ["/usr/bin/nordvpnd", "&"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/usr/bin/nordvpnd", "&"]
+
+# Use this for debugging
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
