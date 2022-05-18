@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd /vagrant
+
+apt-get update && \
+apt-get install -y docker.io && \
+docker build -t nordvpn ubuntu/ && \
+CID=$(docker run -d --cap-add=NET_ADMIN --device=/dev/net/tun nordvpn)
+
+if [ $? -eq 0 ]; then
+    # race condition: Whoops! /run/nordvpn/nordvpnd.sock not found
+    docker exec $CID ls -l /run/nordvpn/nordvpnd.sock 2>/dev/null
+    until [ $? -eq 0 ]; do
+	    sleep 1
+        docker exec $CID ls -l /run/nordvpn/nordvpnd.sock 2>/dev/null
+    done
+
+    docker exec $CID nordvpn login --username 'your-nordaccount-username' --password 'your-nordaccount-password' && \
+    docker exec $CID nordvpn connect United_States
+fi
